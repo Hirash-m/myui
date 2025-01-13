@@ -1,0 +1,1 @@
+export const Domain = "http://heresh.runasp.net";
