@@ -8,5 +8,10 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  isSidebarToggled: boolean = false;
+
+  toggleSidebar() {
+    this.isSidebarToggled = !this.isSidebarToggled;
+  }
   title = 'myui';
 }
