@@ -11,23 +11,32 @@ import { AddproductComponent } from './addproduct/addproduct.component';
   styleUrls: ['./product.component.css'],
   imports: [CommonModule, ReactiveFormsModule, AddproductComponent],
 })
-export class ProductComponent implements OnInit, AfterViewInit {
+export class ProductComponent implements OnInit {
+
   products: product[] = [];
-
   public productForm!: FormGroup;
-
-  @ViewChild(AddproductComponent, { static: false }) addProductComponent!: AddproductComponent;
+  isLoading: boolean = true; 
+  isPopupVisible: boolean = false; 
 
   constructor(private productservice: ProductService) {}
 
   ngOnInit(): void {
-    this.productservice.GetData(1, 100, 'Id', true).subscribe((response) => {
-      if (response.isSucceeded) {
-        this.products = response.data;
-      } else {
-        console.error('Failed to fetch products:', response.message);
-      }
+    this.productservice.GetData(1, 100, 'Id', true).subscribe({
+      next: (response) => {
+        if (response.isSucceeded) {
+          this.products = response.data;
+        } else {
+          console.error('Failed to fetch products:', response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching products:', err);
+      },
+      complete: () => {
+        this.isLoading = false; // تغییر وضعیت پس از تکمیل درخواست
+      },
     });
+  
 
     this.productForm = new FormGroup({
       id: new FormControl(0),
@@ -37,40 +46,42 @@ export class ProductComponent implements OnInit, AfterViewInit {
       countTypeId: new FormControl(1),
       countTypename: new FormControl(''),
     });
+  
   }
 
-  ngAfterViewInit(): void {
-    // اطمینان حاصل کنید که addProductComponent بارگذاری شده است
-    if (this.addProductComponent) {
-      console.log('AddProductComponent بارگذاری شد');
+
+  openPopup(): void {
+    this.isPopupVisible = true;
+  }
+
+  closePopup(): void {
+    this.isPopupVisible = false;
+  }
+
+  saveProduct(): void {
+    if (this.productForm.valid) {
+      const newProduct: product = this.productForm.value;
+      this.productservice.insertProduct(newProduct).subscribe({
+        next: (response) => {
+          if (response.isSucceeded) {
+            console.log('Product added successfully:', response.data);
+            
+            this.closePopup();
+          } else {
+            console.error('Failed to add product:', response.message);
+          }
+        },
+        error: (err) => {
+          console.error('Error adding product:', err);
+        },
+      });
     } else {
-      console.error('AddProductComponent بارگذاری نشده است');
+      console.error('Form is invalid');
     }
   }
+  
+ 
 
-  openPopup() {
-    // اطمینان از اینکه addProductComponent قبل از فراخوانی متد open() بارگذاری شده باشد
-    if (this.addProductComponent) {
-      console.log('در حال باز کردن پاپ آپ');
-      this.addProductComponent.open();
-    } else {
-      console.error('AddProductComponent بارگذاری نشده است');
-    }
-  }
+  
 
-  handleProductAdded(product: { name: string, price: number }) {
-    console.log('محصول اضافه شد:', product);
-    // اینجا می‌توانید محصول را ذخیره کنید یا به سرور ارسال کنید
-  }
-
-  addProduct() {
-    const product = this.productForm.value;
-    this.productservice.insertProduct(product).subscribe((response) => {
-      if (response.isSucceeded) {
-        this.products.push(product);
-      } else {
-        console.error('Failed to insert product:', response.message);
-      }
-    });
-  }
 }
