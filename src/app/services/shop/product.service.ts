@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable} from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { baseResponse } from '../../DTO/baseResponse';
 import { product } from '../../DTO/Shop/product';
 import { Domain } from '../../../utilities/Path';
@@ -20,7 +20,7 @@ export class ProductService {
   GetData(pageNumber : number,pageSize : number ,sortBy : string ,sortDirection:boolean):Observable<baseResponse<product>>{
 
     const requestPayload={
-      Number : pageNumber,
+      pageNumber : pageNumber,
       pageSize : pageSize,
       sortBy : sortBy,
       sortDirection : sortDirection,
@@ -29,8 +29,9 @@ export class ProductService {
       'accept': 'text/plain',
       'Content-Type': 'application/json'
     });
-
-    return this.http.post<baseResponse<product>>(this.apiUrl+'/GetAll',requestPayload , {headers} );
+    
+    return this.http.post<baseResponse<product>>(this.apiUrl+'/GetAll',requestPayload , {headers} ).
+    pipe(tap(c=> console.log(c)));
 
     
   }

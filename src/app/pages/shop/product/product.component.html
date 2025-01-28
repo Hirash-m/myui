@@ -23,7 +23,8 @@
           </div>
 
           <!-- جدول محصولات -->
-          <table *ngIf="!isLoading && products.length > 0" class="table datatable">
+           <div *ngIf="!isLoading && responseData.data.length > 0" >
+          <table class="table datatable">
             <thead>
               <tr>
                 <th>#</th>
@@ -33,17 +34,50 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let product of products; let i = index">
-                <td>{{ i + 1 }}</td>
+              <tr *ngFor="let product of responseData.data; let i = index">
+                <td>{{ product.id }}</td>
                 <td>{{ product.productCode }}</td>
                 <td>{{ product.name }}</td>
                 <td>{{ product.price }}</td>
               </tr>
             </tbody>
           </table>
+            <!-- Pagination with icons -->
+            <nav aria-label="Page navigation example">
+              <ul class="pagination">
+                <li class="page-item" *ngIf="responseData.pageNumber!= 1">
+                  <button class="page-link" aria-label="Previous" (click)="ChangePage(responseData.pageNumber-1)">
+                    <span aria-hidden="true">&laquo;</span>
+                  </button>
+                </li>
+                
+                <li class="page-item"><a class="page-link" href="#">{{responseData.pageNumber}}</a></li>
+                
+                <li class="page-item" *ngIf="responseData.pageNumber!= responseData.totalPages">
+                  <button class="page-link"  aria-label="Next" (click)="ChangePage(responseData.pageNumber+1)">
+                    <span aria-hidden="true">&raquo;</span>
+                  </button>
+                </li>
+                   <div class="col-sm-1">
+                  <select class="form-select" (change)="ChangePageSize($event)" >
+                    <option selected>2</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="8">8</option>
+                  </select>
+                </div>
+               
+                <li>
+                        تعداد کل : {{responseData.totalRecords}} | تعداد کل صفحات : {{responseData.totalPages}}
+                </li>
+
+              </ul>
+            </nav><!-- End Pagination with icons -->
+          
+          </div>
 
           <!-- پیام زمانی که هیچ محصولی موجود نیست -->
-          <div *ngIf="!isLoading && products.length === 0">
+          <div *ngIf="!isLoading && responseData.data.length === 0">
             هیچ محصولی یافت نشد.
           </div>
         </div>
