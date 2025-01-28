@@ -76,7 +76,10 @@ export class ProductComponent implements OnInit {
     }
   }
   
- loadProducts(): void {   this.productservice.GetData(this.pageNumber, this.pageSize, this.fieldToSort, 
+ loadProducts(): void {  
+  
+  
+  this.productservice.GetData(this.pageNumber, this.pageSize, this.fieldToSort, 
                                 this.sortDesc).subscribe({
   next: (response) => {
     if (response.isSucceeded) {
